@@ -6,7 +6,7 @@ if (this.chain.length != 0)
 {
   var child_context =
   {
-    design: this.escape().name,
+    design: this.escape().name.replace(phoxy.Config().ejs_dir, ""),
     data: this,
     up: ShortcutContext,
     chain: function(cb)
