@@ -1,0 +1,11 @@
+<%
+function Delay(cb)
+{
+  phoxy.Defer(function()
+  {
+    cb(__context.data);
+  }, __context.delay);
+}
+%>
+
+<%= this.DeferRender(__context.design, Delay) %>

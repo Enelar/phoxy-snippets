@@ -1,0 +1,14 @@
+<%
+function Delay(cb)
+{
+  var script = __context.script;
+  if (typeof script == 'string')
+    script = [script];
+  require(script, function()
+  {
+    cb(__context.data);
+  });
+}
+%>
+
+<%= this.DeferRender(__context.design, Delay) %>
