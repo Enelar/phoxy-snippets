@@ -1,45 +1,72 @@
 <%
-if (typeof this.chain != 'object')
-  return "";
-var task = this.chain.pop();
-if (this.chain.length != 0)
-{
-  var child_context =
-  {
-    design: this.escape().name.replace(phoxy.Config().ejs_dir, ""),
-    data: this,
-    up: ShortcutContext,
-    chain: function(cb)
-    {
-      var context = this;
-      return this.DeferRender(this.design, this.data, function()
-      {
-        context.up(this);
-        if (typeof cb == 'function')
-          cb.apply(this, arguments);
-      })
-    }
-  };
-  %>
-  <%= this.DeferRender(task, child_context) %>
-<%
-}
-else
-{ // Exit condition
-%>
-  <%= this.DeferRender(task, this.data, ShortcutChildContext) %>
-<%
-}
-%>
+/* Purpose: chaining efects on target design
+ * Usage:
+ *   DeferRender('snippets/chain', obj);
+ * Where object is:
+ * {
+ *   chain: [a,b,c]
+ *   data: d
+ * }
+ *  b, c - effects that would be applied to a
+ *  a - target design, that would be rendered last
+ * How it done:
+ *   All effects registering as chain elements, and when
+ *   last element rendered, chain unrolling with calling
+ *   handlers. All effect MUST call this.chain() once
+ * Effect example:
+ *   this.chain(function()
+ *   {
+ *     this.first(); // <-- first DOM element of target design
+ *     __this.first(); // <-- first DOM element of current chain
+ *   })
+ */
 
-<%
-function ShortcutChildContext()
-{
-  ShortcutContext(this);
+// Helper functions
+function chain(decorator)
+{ // Unroll the chain function. Reshedule remain tasks
+  var context = this;
+  this.DeferRender(this.design, this.data, function()
+  {
+    context.up(this);
+    if (typeof decorator == 'function')
+      decorator.apply(this, arguments);
+  })
 }
-function ShortcutContext(context)
-{
+
+function CallbackEndOfChain()
+{ // Copy current context and share it with all other chains
+  ShareContextToNext(this);
+}
+
+function ShareContextToNext(context)
+{ // Share context to next
   context.escape = __context.escape;
   __context.escape().across = context;
+}
+
+
+
+
+if (typeof this.chain != 'object')
+  return phoxy.Log(2, "Empty chain");
+
+/* Get first tast, and if it not empty generate chain sequence
+ */
+
+
+var task = this.chain.pop();
+if (!this.chain.length) // if last one, direct render and exit
+  return this.DeferRender(task, this.data, CallbackEndOfChain);
+else
+{
+  var chain_snippet_location = this.escape().name.replace(phoxy.Config().ejs_dir, "");
+  var child_context =
+  {
+    design: chain_snippet_location,
+    data: this,
+    up: ShareContextToNext,
+    chain: chain,
+  };
+  this.DeferRender(task, child_context);
 }
 %>
