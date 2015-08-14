@@ -1,0 +1,16 @@
+<%
+var id = this.arr.length;
+
+for (var k in this.arr)
+{
+  var v = this.arr[k];
+  v.each_id = id--;
+
+  // Isolate canvas
+  var origin_canvas = this.escape().DrawTo([]);
+    this.each(v);
+  var just_drawed = this.escape().DrawTo(origin_canvas);
+  // In case comeone messed with canvas too
+  this.escape().DrawTo(origin_canvas.concat(just_drawed));
+}
+%>
