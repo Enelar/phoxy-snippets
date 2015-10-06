@@ -14,20 +14,25 @@
  *   last element rendered, chain unrolling with calling
  *   handlers. All effect MUST call this.chain() once
  * Effect example:
- *   this.chain(function()
+ *   __this.chain(function()
  *   {
  *     this.first(); // <-- first DOM element of target design
  *     __this.first(); // <-- first DOM element of current chain
  *   })
+ * Requirments:
+ *   ENJS isolation depth more on equal than 3
  */
+
+var child_context = null;
 
 // Helper functions
 function chain(decorator)
 { // Unroll the chain function. Reshedule remain tasks
   var context = this;
-  this.DeferRender(this.design, this.data, function()
+
+  context.CascadeDesign(child_context.design, child_context.data, function chain_payload_context_shorcut()
   {
-    context.up(this);
+    child_context.up(this);
     if (typeof decorator == 'function')
       decorator.apply(this, arguments);
   })
@@ -40,33 +45,40 @@ function CallbackEndOfChain()
 
 function ShareContextToNext(context)
 { // Share context to next
-  context.escape = __context.escape;
-  __context.escape().across = context;
+  context.escape = __this.escape;
+  __this.escape().across = context;
 }
 
 
 
 
-if (typeof this.chain != 'object')
+if (typeof __this.chain != 'object')
   return phoxy.Log(2, "Empty chain");
 
 /* Get first tast, and if it not empty generate chain sequence
  */
 
 
-var task = this.chain.pop();
-if (!this.chain.length) // if last one, direct render and exit
-  return this.DeferRender(task, this.data, CallbackEndOfChain);
+var task = __this.chain.pop();
+if (!__this.chain.length) // if last one, direct render and exit
+  return __this.CascadeDesign(task, __this.data, CallbackEndOfChain);
 else
 {
-  var chain_snippet_location = this.escape().name.replace(phoxy.Config().ejs_dir, "");
-  var child_context =
+  var chain_snippet_location = __this.escape().name.replace(phoxy.Config().ejs_dir, "");
+
+  child_context =
   {
     design: chain_snippet_location,
-    data: this,
+    data: __this,
     up: ShareContextToNext,
-    chain: chain,
   };
-  this.DeferRender(task, child_context);
+
+  var payload_context =
+  {
+    comment: "You will get valid context at chain callback. Please use __this.chain()",
+    chain: chain,
+  }
+
+  __this.CascadeDesign(task, payload_context);
 }
 %>
