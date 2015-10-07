@@ -1,7 +1,7 @@
 <%
 /* Purpose: chaining efects on target design
  * Usage:
- *   DeferRender('snippets/chain', obj);
+ *   __this.CascadeDesign('snippets/chain', obj);
  * Where object is:
  * {
  *   chain: [a,b,c]
@@ -30,7 +30,7 @@ function chain(decorator)
 { // Unroll the chain function. Reshedule remain tasks
   var context = this;
 
-  context.CascadeDesign(child_context.design, child_context.data, function chain_payload_context_shorcut()
+  context.CascadeDesign(child_context.design, child_context.data, function snippets_chain_payload_context_shorcut()
   {
     child_context.up(this);
     if (typeof decorator == 'function')
