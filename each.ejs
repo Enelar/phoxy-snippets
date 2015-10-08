@@ -38,7 +38,7 @@ for (var k in __this.arr)
 
   // Isolate canvas
   var origin_canvas = __this.escape().DrawTo([]);
-    __this.each(v);
+    __this.each(v, k);
   var just_drawed = __this.escape().DrawTo(origin_canvas);
   // In case comeone messed with canvas too
   __this.escape().DrawTo(origin_canvas.concat(just_drawed));
