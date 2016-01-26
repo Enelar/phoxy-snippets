@@ -6,6 +6,7 @@
  * {
  *   scripts: javascript files that should be additional loaded
  *   css: css files that should be linked
+ *   callback: method for custom head data append
  * }
  * Notification: snippets finishing as soon as last script loaded
  */
@@ -29,6 +30,11 @@ for (var k in __this.css)
   <link rel="stylesheet" href="<%@ __this.css[k] %>">
 <%
 }
+%>
+
+<%
+if (typeof __this.callback == 'function')
+  __this.callback();
 %>
 </div>
 
