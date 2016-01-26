@@ -5,6 +5,6 @@
   "minimum-stability": "dev",
   "require" :
   {
-    "phoxy/phoxy": "~1.4.1.7"
+    "phoxy/phoxy": "~1.4.2"
   }
 }
