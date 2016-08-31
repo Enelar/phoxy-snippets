@@ -24,6 +24,15 @@ for (var k in __this.scripts)
 %>
 
 <%
+for (var k in __this.async_scripts)
+{
+%>
+  <async_require src="<%@ __this.async_scripts[k] %>"></async_require>
+<%
+}
+%>
+
+<%
 for (var k in __this.css)
 {
 %>
@@ -52,6 +61,11 @@ __this.Defer(function()
   {
     phoxy.Log(3, "Head scripts loaded");
     __this.escape().CheckIsCompleted.call(__this);
+  });
+
+  __this.first().find('async_require').detach().each(function()
+  {
+    require([$(this).attr('src')], function() {});
   });
 
   var element = this.first().detach();
